@@ -41,6 +41,32 @@ Newman is a command-line collection runner for Postman. It allows you to effortl
 14. [Community Support](#community-support)
 15. [License](#license)
 
+## Troubleshooting SSL Errors with Proxies
+
+When running Newman against a proxy, you might encounter SSL errors that prevent your collections from running correctly. This section provides guidance on troubleshooting and resolving these SSL errors.
+
+### Configuring Proxies Correctly
+
+To avoid SSL errors when using a proxy, ensure that your proxy configuration is correct. Here's an example script demonstrating the correct use of Newman with a proxy configuration:
+
+```bash
+# Set the proxy environment variables
+export HTTP_PROXY=http://proxy.example.com:3128
+export HTTPS_PROXY=https://proxy.example.com:3128
+
+# Run your Newman collection
+newman run https://api.getpostman.com/collections/your-collection-id?apikey=your-api-key
+```
+
+### Ensuring SSL Certificates are Correctly Installed and Trusted
+
+SSL errors can also occur if the SSL certificates used by your proxy or target API are not correctly installed or trusted by your system. Make sure that:
+
+- Your proxy's SSL certificate is correctly installed in your system's certificate store.
+- The SSL certificate of the API you're testing is valid and trusted.
+- If you're using self-signed certificates, consider using the `--insecure` flag with Newman to bypass SSL verification (use with caution).
+
+By following these steps, you should be able to resolve SSL errors encountered when running Newman against a proxy.
 
 ## Getting started
 
