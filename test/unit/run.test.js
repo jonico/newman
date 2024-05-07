@@ -307,4 +307,17 @@ describe('run module', function () {
             });
         });
     });
+
+    describe('URL Redaction in Error Messages', function () {
+        it('should redact secrets from URLs in error messages for util.fetchJson', function (done) {
+            run({
+                collection: 'https://api.getpostman.com/collections/12345?apikey=PMAK-12345'
+            }, function (err) {
+                expect(err).to.be.an('error');
+                expect(err.message).to.not.include('PMAK-12345');
+                expect(err.message).to.include('PMAK-[REDACTED]');
+                done();
+            });
+        });
+    });
 });
