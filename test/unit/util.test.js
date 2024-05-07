@@ -94,4 +94,46 @@ describe('utility helpers', function () {
             expect(util.beautifyTime(timings)).to.eql(beautifiedTimings);
         });
     });
+
+    describe('redactSecrets', function () {
+        it('should redact secrets from URLs in error messages', function () {
+            var message = 'unable to fetch data from url "https://api.getpostman.com/collections/12345?apikey=PMAK-12345"',
+                redactedMessage = 'unable to fetch data from url "https://api.getpostman.com/collections/12345?apikey=PMAK-[REDACTED]"';
+
+            expect(util.redactSecrets(message)).to.equal(redactedMessage);
+        });
+
+        it('should handle multiple secrets in a single message', function () {
+            var message = 'errors in "https://api.getpostman.com/collections/12345?apikey=PMAK-12345" and ' +
+                '"https://api.getpostman.com/environments/67890?apikey=PMAK-67890"',
+                redactedMessage = 'errors in "https://api.getpostman.com/collections/12345?apikey=PMAK-[REDACTED]" and ' +
+                '"https://api.getpostman.com/environments/67890?apikey=PMAK-[REDACTED]"';
+
+            expect(util.redactSecrets(message)).to.equal(redactedMessage);
+        });
+
+        it('should not alter messages without secrets', function () {
+            var message = 'collection could not be loaded from "https://api.getpostman.com/collections/12345"';
+
+            expect(util.redactSecrets(message)).to.equal(message);
+        });
+
+        it('should redact secrets in error messages for util.fetchJson', function (done) {
+            util.fetchJson('collection', 'https://api.getpostman.com/collections/12345?apikey=PMAK-12345', function (err) {
+                expect(err).to.be.an('error');
+                expect(err.message).to.not.include('PMAK-12345');
+                expect(err.message).to.include('PMAK-[REDACTED]');
+                done();
+            });
+        });
+
+        it('should redact secrets from URLs in error messages for util.fetchJson', function (done) {
+            util.fetchJson('collection', 'https://api.getpostman.com/collections/12345?apikey=PMAK-12345', function (err) {
+                expect(err).to.be.an('error');
+                expect(err.message).to.not.include('PMAK-12345');
+                expect(err.message).to.include('PMAK-[REDACTED]');
+                done();
+            });
+        });
+    });
 });
